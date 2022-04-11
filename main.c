@@ -183,7 +183,7 @@ int delete_at(void **arr, int *len, int index)
 
 		data->data = realloc(data->data, data->header->len);
 
-		memcpy(data->data, arr + len_aux, data->header->len);
+		memcpy(data->data, *(arr) + len_aux, data->header->len);
 		len_aux += data->header->len;
 		if (i < index && len_aux != *(len))
 		{
@@ -192,7 +192,6 @@ int delete_at(void **arr, int *len, int index)
 			free(data);
 		}
 	}
-
 	printf("\n");
 	if ( i-1 != index)
 		{
@@ -201,7 +200,15 @@ int delete_at(void **arr, int *len, int index)
 			free(data);
 			return 1;
 		}
-	printf("Tipul sters : %c\n", data->header->type);
+
+	// go to first byte from deleted arr
+	int len_initial = len_aux - data->header->len - sizeof(head);
+
+	memcpy(*(arr) + len_initial, *(arr) + len_aux, *(len) - len_aux);
+	
+	*(arr) = (void *)realloc(*(arr), *(len) - (len_aux-len_initial));
+	*(len) -= (len_aux - len_initial);
+	// printf("Tipul sters : %c\n", data->header->type);
 
 
 	free(data->data);
