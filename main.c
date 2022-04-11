@@ -12,7 +12,6 @@ int add_last(void **arr, int *len, data_structure *data);
 int delete_at(void **arr, int *len, int index);
 int add_at(void **arr, int *len, data_structure *data, int index);
 
-
 char *read_word()
 {
 	char *word = malloc(MAX_str);
@@ -156,7 +155,83 @@ int add_last(void **arr, int *len, data_structure *data)
 
 int add_at(void **arr, int *len, data_structure *data, int index)
 {
-	printf("add_at");
+	if (index < 0)
+		return 1;
+
+	if (*(arr) == NULL)
+	{
+		if( index == 0 )
+		{
+		add_last(&(*arr), &(*len), data);
+		return 0;
+		}
+		if ( index != 0 )
+		return 1;
+	}
+
+	data_structure *data_aux = NULL;
+	int i, len_aux = 0;
+
+	// find_index
+	for (i = 0; i <= index && len_aux < *(len); i++)
+	{
+		data_aux = (data_structure *)malloc(sizeof(data_structure));
+
+		data_aux->header = (head *)malloc(sizeof(head));
+
+		data_aux->data = (void *)malloc(sizeof(void));
+		memcpy(data_aux->header, *(arr) + len_aux, sizeof(head));
+		// printf("index gasit= %p\n", *(arr) + len_aux);
+		// printf("valoare gasit= %c\n", *((char *)*(arr) + len_aux));
+
+		len_aux += sizeof(head);
+
+		data_aux->data = realloc(data_aux->data, data_aux->header->len);
+
+		memcpy(data_aux->data, *(arr) + len_aux, data_aux->header->len);
+		len_aux += data_aux->header->len;
+		if (i < index && len_aux != *(len))
+		{
+			free(data_aux->data);
+			free(data_aux->header);
+			free(data_aux);
+		}
+	}
+
+	if (i - 1 != index)
+	{
+		free(data_aux->data);
+		free(data_aux->header);
+		free(data_aux);
+		add_last(&(*arr), &(*len), data);
+		return 0;
+	}
+
+	// go to first byte for add arr
+	int len_initial = len_aux - data_aux->header->len - sizeof(head);
+
+	void *arr_new = NULL;
+	int len_new = 0;
+	
+	// creating a new array for my new data
+	
+	add_last(&arr_new, &len_new, data);
+
+
+	// allocating memory for my array
+	*(arr) = (void *)realloc(*(arr), *(len) + len_new);
+
+
+	memmove(*(arr) + len_initial + len_new, *(arr) + len_initial, *(len) - len_initial);
+	*(len) += len_new;
+
+	memcpy(*(arr) + len_initial, arr_new, len_new);
+
+	free(data_aux->data);
+	free(data_aux->header);
+	free(data_aux);
+
+	free(arr_new);
 	return 0;
 }
 
@@ -204,11 +279,11 @@ void find(void *data_block, int len, int index)
 	len_aux = 0;
 	add_last(&arr, &len_aux, data);
 	print(arr, len_aux);
+
 	free(data->header);
 	free(data->data);
 	free(data);
 	free(arr);
-
 }
 
 int delete_at(void **arr, int *len, int index)
@@ -386,7 +461,11 @@ int main()
 		if (strcmp(cmd, "insert_at") == 0)
 		{
 			scanf("%d", &index);
+			data = create_data();
 			add_at(&arr, &len, data, index);
+			free(data->header);
+			free(data->data);
+			free(data);
 		}
 
 		if (strcmp(cmd, "find") == 0)
