@@ -25,7 +25,7 @@ data_structure *create_data()
 
 	data->header = (head *)malloc(sizeof(head));
 	data->header->len = 0;
-	
+
 	scanf("%s", &(data)->header->type);
 
 	int8_t banknote8;
@@ -113,7 +113,6 @@ int add_last(void **arr, int *len, data_structure *data)
 
 	char *aux = (char *)malloc(sizeof(head) + data->header->len);
 
-
 	int aux_len = 0;
 	// add header (type & len)
 	memcpy(aux, data->header, sizeof(head));
@@ -139,7 +138,7 @@ int add_last(void **arr, int *len, data_structure *data)
 
 	// add to the big array
 	memcpy(*(arr) + *(len), aux, aux_len);
-	// printf("p= %p\n", *(arr) + *(len));
+	// printf("index= %p\n", *(arr) + *(len));
 	*(len) += aux_len;
 
 	// printf("add last\n");
@@ -162,8 +161,52 @@ void find(void *data_block, int len, int index)
 }
 
 int delete_at(void **arr, int *len, int index)
-{
-	printf("delete");
+{	
+	if ( index < 0 || *(arr) == NULL)
+		return 1;
+	data_structure *data = NULL;
+	int i, len_aux = 0;
+
+	// find_index
+	for (i = 0; i <= index && len_aux < *(len); i++)
+	{
+		data = (data_structure *)malloc(sizeof(data_structure));
+
+		data->header = (head *)malloc(sizeof(head));
+
+		data->data = (void *)malloc(sizeof(void));
+		memcpy(data->header, *(arr) + len_aux, sizeof(head));
+		// printf("index gasit= %p\n", *(arr) + len_aux);
+		// printf("valoare gasit= %c\n", *((char *)*(arr) + len_aux));
+
+		len_aux += sizeof(head);
+
+		data->data = realloc(data->data, data->header->len);
+
+		memcpy(data->data, arr + len_aux, data->header->len);
+		len_aux += data->header->len;
+		if (i < index && len_aux != *(len))
+		{
+			free(data->data);
+			free(data->header);
+			free(data);
+		}
+	}
+
+	printf("\n");
+	if ( i-1 != index)
+		{
+			free(data->data);
+			free(data->header);
+			free(data);
+			return 1;
+		}
+	printf("Tipul sters : %c\n", data->header->type);
+
+
+	free(data->data);
+	free(data->header);
+	free(data);
 	return 0;
 }
 
@@ -175,7 +218,6 @@ void print(void *arr, int len)
 	while (len_aux < len)
 	{
 		data = (data_structure *)malloc(sizeof(data_structure));
-
 
 		data->header = (head *)malloc(sizeof(head));
 
@@ -191,9 +233,9 @@ void print(void *arr, int len)
 		// for (int i = 0; i < len; i++)
 		// 	printf("result = 0x%d p=%p\n", *((char *)arr + i), arr + i);
 
-		printf("Tipul %c\n", data->header->type); 
+		printf("Tipul %c\n", data->header->type);
 
-		char *p = (char *)arr + len_aux - data->header->len ;
+		char *p = (char *)arr + len_aux - data->header->len;
 
 		while (*p != '\0')
 		{
@@ -222,7 +264,7 @@ void print(void *arr, int len)
 		if (data->header->type == '2')
 		{
 			first_banknote = (int16_t *)++p;
-			p +=2;
+			p += 2;
 
 			second_banknote = (int32_t *)p;
 			p += 4;
@@ -313,7 +355,7 @@ int main()
 
 	if (arr != NULL)
 		free(arr);
-		
+
 	free(cmd);
 
 	return 0;

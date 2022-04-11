@@ -1,6 +1,10 @@
 memCheck
 valgrind-out.txt
 OUTPUTS/*
+INPUTS/*
+DEV_OUTPUT/*
 !OUTPUTS/.gitkeep
+input
 main
+main.o
 *.o
