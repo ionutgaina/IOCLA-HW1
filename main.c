@@ -12,6 +12,31 @@ int add_last(void **arr, int *len, data_structure *data);
 int delete_at(void **arr, int *len, int index);
 int add_at(void **arr, int *len, data_structure *data, int index);
 
+int length_arr(void *arr, int len)
+{
+	int bytes = 0;
+	data_structure *data ;
+	for ( int i = 0 ; i < len ; i++)
+	{
+		data = (data_structure *)malloc(sizeof(data_structure));
+
+		data->header = (head *)malloc(sizeof(head));
+
+		data->data = (void *)malloc(sizeof(void));
+		memcpy(data->header, arr + bytes, sizeof(head));
+		bytes += sizeof(head);
+
+		data->data = realloc(data->data, data->header->len);
+
+		memcpy(data->data, arr + bytes, data->header->len);
+		bytes += data->header->len;
+		free(data->header);
+		free(data->data);
+		free(data);
+	}
+	return bytes;
+}
+
 char *read_word()
 {
 	char *word = malloc(MAX_str);
@@ -115,6 +140,9 @@ int add_last(void **arr, int *len, data_structure *data)
 	if (data == NULL)
 		return 1;
 
+	//calculate lenght of array in bytes
+	int arr_bytes = length_arr(*arr, *len);
+
 	char *aux = (char *)malloc(sizeof(head) + data->header->len);
 
 	int aux_len = 0;
@@ -125,11 +153,11 @@ int add_last(void **arr, int *len, data_structure *data)
 	// add data
 	memcpy(aux + aux_len, data->data, data->header->len);
 	aux_len += data->header->len;
-
+	
 	// alloc the big array
 	if (*(arr) != NULL)
 	{
-		*(arr) = (void *)realloc(*(arr), aux_len + *(len));
+		*(arr) = (void *)realloc(*(arr), aux_len + arr_bytes);
 	}
 
 	if (*(arr) == NULL)
@@ -138,8 +166,7 @@ int add_last(void **arr, int *len, data_structure *data)
 	}
 
 	// add to the big array
-	memcpy(*(arr) + *(len), aux, aux_len);
-	*(len) += aux_len;
+	memcpy(*(arr) + arr_bytes, aux, aux_len);
 
 	free(aux);
 	return 0;
@@ -274,13 +301,15 @@ void find(void *data_block, int len, int index)
 
 int delete_at(void **arr, int *len, int index)
 {
-	if (index < 0 || *(arr) == NULL)
+	if (index < 0 || *(arr) == NULL || *(len) < index)
 		return 1;
 	data_structure *data = NULL;
 	int i, len_aux = 0;
 
+	int arr_bytes = length_arr(*arr, *len);
+	
 	// find_index
-	for (i = 0; i <= index && len_aux < *(len); i++)
+	for (i = 0; i <= index; i++)
 	{
 		data = (data_structure *)malloc(sizeof(data_structure));
 
@@ -295,7 +324,7 @@ int delete_at(void **arr, int *len, int index)
 
 		memcpy(data->data, *(arr) + len_aux, data->header->len);
 		len_aux += data->header->len;
-		if (i < index && len_aux != *(len))
+		if (i < index )
 		{
 			free(data->data);
 			free(data->header);
@@ -303,21 +332,13 @@ int delete_at(void **arr, int *len, int index)
 		}
 	}
 
-	if (i - 1 != index)
-	{
-		free(data->data);
-		free(data->header);
-		free(data);
-		return 1;
-	}
 
 	// go to first byte from deleted arr
 	int len_initial = len_aux - data->header->len - sizeof(head);
 
-	memcpy(*(arr) + len_initial, *(arr) + len_aux, *(len)-len_aux);
+	memcpy(*(arr) + len_initial, *(arr) + len_aux, arr_bytes-len_aux);
 
-	*(arr) = (void *)realloc(*(arr), *(len) - (len_aux - len_initial));
-	*(len) -= (len_aux - len_initial);
+	*(arr) = (void *)realloc(*(arr), arr_bytes - (len_aux - len_initial));
 
 	free(data->data);
 	free(data->header);
@@ -329,9 +350,10 @@ void print(void *arr, int len)
 {
 	data_structure *data = NULL;
 	int len_aux = 0;
+	int arr_bytes = length_arr(arr, len);
 
-	while (len_aux < len)
-	{
+	for ( int i = 0 ; i < len ; i++)
+		{
 		data = (data_structure *)malloc(sizeof(data_structure));
 
 		data->header = (head *)malloc(sizeof(head));
@@ -433,6 +455,7 @@ int main()
 		{
 			data = create_data();
 			add_last(&arr, &len, data);
+			len++;
 			free(data->header);
 			free(data->data);
 			free(data);
@@ -457,7 +480,8 @@ int main()
 		if (strcmp(cmd, "delete_at") == 0)
 		{
 			scanf("%d", &index);
-			delete_at(&arr, &len, index);
+			if ( !delete_at(&arr, &len, index) )
+				len --;
 		}
 
 		if (strcmp(cmd, "print") == 0)
