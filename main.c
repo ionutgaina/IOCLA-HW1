@@ -102,8 +102,7 @@ data_structure *create_data()
 	aux = (char *)realloc(aux, data->header->len);
 
 	memcpy(aux + data->header->len - strlen(name) - 1, name, strlen(name) + 1);
-	// for (int i = 0; i < data->header->len; i++)
-	// 	printf("result = 0x%c\n", *(aux + i));
+
 	// copy to data
 	data->data = realloc(aux, data->header->len);
 
@@ -127,9 +126,6 @@ int add_last(void **arr, int *len, data_structure *data)
 	memcpy(aux + aux_len, data->data, data->header->len);
 	aux_len += data->header->len;
 
-	// for (int i = 0; i < aux_len; i++)
-	// printf("result1 = 0x%hx\n", *(aux + i));
-
 	// alloc the big array
 	if (*(arr) != NULL)
 	{
@@ -143,12 +139,8 @@ int add_last(void **arr, int *len, data_structure *data)
 
 	// add to the big array
 	memcpy(*(arr) + *(len), aux, aux_len);
-	// printf("index= %p\n", *(arr) + *(len));
 	*(len) += aux_len;
 
-	// printf("add last\n");
-	// for (int i = 0; i < *(len); i++)
-	// 	printf("result2 = 0x%hx\n", *((char *)*(arr) + i));
 	free(aux);
 	return 0;
 }
@@ -160,13 +152,13 @@ int add_at(void **arr, int *len, data_structure *data, int index)
 
 	if (*(arr) == NULL)
 	{
-		if( index == 0 )
+		if (index == 0)
 		{
-		add_last(&(*arr), &(*len), data);
-		return 0;
+			add_last(&(*arr), &(*len), data);
+			return 0;
 		}
-		if ( index != 0 )
-		return 1;
+		if (index != 0)
+			return 1;
 	}
 
 	data_structure *data_aux = NULL;
@@ -181,8 +173,6 @@ int add_at(void **arr, int *len, data_structure *data, int index)
 
 		data_aux->data = (void *)malloc(sizeof(void));
 		memcpy(data_aux->header, *(arr) + len_aux, sizeof(head));
-		// printf("index gasit= %p\n", *(arr) + len_aux);
-		// printf("valoare gasit= %c\n", *((char *)*(arr) + len_aux));
 
 		len_aux += sizeof(head);
 
@@ -212,17 +202,15 @@ int add_at(void **arr, int *len, data_structure *data, int index)
 
 	void *arr_new = NULL;
 	int len_new = 0;
-	
-	// creating a new array for my new data
-	
-	add_last(&arr_new, &len_new, data);
 
+	// creating a new array for my new data
+
+	add_last(&arr_new, &len_new, data);
 
 	// allocating memory for my array
 	*(arr) = (void *)realloc(*(arr), *(len) + len_new);
 
-
-	memmove(*(arr) + len_initial + len_new, *(arr) + len_initial, *(len) - len_initial);
+	memmove(*(arr) + len_initial + len_new, *(arr) + len_initial, *(len)-len_initial);
 	*(len) += len_new;
 
 	memcpy(*(arr) + len_initial, arr_new, len_new);
@@ -251,8 +239,6 @@ void find(void *data_block, int len, int index)
 
 		data->data = (void *)malloc(sizeof(void));
 		memcpy(data->header, data_block + len_aux, sizeof(head));
-		// printf("index gasit= %p\n", data_block + len_aux);
-		// printf("valoare gasit= %c\n", *((char *)data_block + len_aux));
 
 		len_aux += sizeof(head);
 
@@ -302,8 +288,6 @@ int delete_at(void **arr, int *len, int index)
 
 		data->data = (void *)malloc(sizeof(void));
 		memcpy(data->header, *(arr) + len_aux, sizeof(head));
-		// printf("index gasit= %p\n", *(arr) + len_aux);
-		// printf("valoare gasit= %c\n", *((char *)*(arr) + len_aux));
 
 		len_aux += sizeof(head);
 
@@ -360,9 +344,6 @@ void print(void *arr, int len)
 
 		memcpy(data->data, arr + len_aux, data->header->len);
 		len_aux += data->header->len;
-
-		// for (int i = 0; i < len; i++)
-		// 	printf("result = 0x%d p=%p\n", *((char *)arr + i), arr + i);
 
 		printf("Tipul %c\n", data->header->type);
 
@@ -431,7 +412,6 @@ void print(void *arr, int len)
 		free(data->data);
 		free(data->header);
 		free(data);
-		// printf("p2= %p \n", arr + len_aux);
 	}
 }
 
