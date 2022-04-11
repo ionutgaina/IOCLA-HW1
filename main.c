@@ -7,6 +7,12 @@
 
 #define MAX_str 256
 
+void print(void *arr, int len);
+int add_last(void **arr, int *len, data_structure *data);
+int delete_at(void **arr, int *len, int index);
+int add_at(void **arr, int *len, data_structure *data, int index);
+
+
 char *read_word()
 {
 	char *word = malloc(MAX_str);
@@ -156,13 +162,58 @@ int add_at(void **arr, int *len, data_structure *data, int index)
 
 void find(void *data_block, int len, int index)
 {
-	printf("find");
-	return;
+	if (index < 0 || data_block == NULL)
+		return;
+	data_structure *data = NULL;
+	int i, len_aux = 0;
+
+	// find_index
+	for (i = 0; i <= index && len_aux < len; i++)
+	{
+		data = (data_structure *)malloc(sizeof(data_structure));
+
+		data->header = (head *)malloc(sizeof(head));
+
+		data->data = (void *)malloc(sizeof(void));
+		memcpy(data->header, data_block + len_aux, sizeof(head));
+		// printf("index gasit= %p\n", data_block + len_aux);
+		// printf("valoare gasit= %c\n", *((char *)data_block + len_aux));
+
+		len_aux += sizeof(head);
+
+		data->data = realloc(data->data, data->header->len);
+
+		memcpy(data->data, data_block + len_aux, data->header->len);
+		len_aux += data->header->len;
+		if (i < index && len_aux != len)
+		{
+			free(data->data);
+			free(data->header);
+			free(data);
+		}
+	}
+	if (i - 1 != index)
+	{
+		free(data->data);
+		free(data->header);
+		free(data);
+		return;
+	}
+
+	void *arr = NULL;
+	len_aux = 0;
+	add_last(&arr, &len_aux, data);
+	print(arr, len_aux);
+	free(data->header);
+	free(data->data);
+	free(data);
+	free(arr);
+
 }
 
 int delete_at(void **arr, int *len, int index)
-{	
-	if ( index < 0 || *(arr) == NULL)
+{
+	if (index < 0 || *(arr) == NULL)
 		return 1;
 	data_structure *data = NULL;
 	int i, len_aux = 0;
@@ -192,24 +243,22 @@ int delete_at(void **arr, int *len, int index)
 			free(data);
 		}
 	}
-	printf("\n");
-	if ( i-1 != index)
-		{
-			free(data->data);
-			free(data->header);
-			free(data);
-			return 1;
-		}
+
+	if (i - 1 != index)
+	{
+		free(data->data);
+		free(data->header);
+		free(data);
+		return 1;
+	}
 
 	// go to first byte from deleted arr
 	int len_initial = len_aux - data->header->len - sizeof(head);
 
-	memcpy(*(arr) + len_initial, *(arr) + len_aux, *(len) - len_aux);
-	
-	*(arr) = (void *)realloc(*(arr), *(len) - (len_aux-len_initial));
-	*(len) -= (len_aux - len_initial);
-	// printf("Tipul sters : %c\n", data->header->type);
+	memcpy(*(arr) + len_initial, *(arr) + len_aux, *(len)-len_aux);
 
+	*(arr) = (void *)realloc(*(arr), *(len) - (len_aux - len_initial));
+	*(len) -= (len_aux - len_initial);
 
 	free(data->data);
 	free(data->header);
@@ -343,7 +392,7 @@ int main()
 		if (strcmp(cmd, "find") == 0)
 		{
 			scanf("%d", &index);
-			find(data, len, index);
+			find(arr, len, index);
 		}
 
 		if (strcmp(cmd, "delete_at") == 0)
