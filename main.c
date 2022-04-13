@@ -44,7 +44,7 @@ char *read_word()
 	scanf("%s", word);
 
 	char *new_word = NULL;
-	new_word = realloc(word, MAX_str);
+	new_word = realloc(word, strlen(word)+1);
 
 	return new_word;
 }
