@@ -1,7 +1,7 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 
 #include "structs.h"
 
@@ -12,457 +12,420 @@ int add_last(void **arr, int *len, data_structure *data);
 int delete_at(void **arr, int *len, int index);
 int add_at(void **arr, int *len, data_structure *data, int index);
 
-int length_arr(void *arr, int len)
-{
-	int bytes = 0;
-	data_structure *data;
-	for (int i = 0; i < len; i++)
-	{
-		data = (data_structure *)malloc(sizeof(data_structure));
+int length_arr(void *arr, int len) {
+  int bytes = 0;
+  data_structure *data;
+  for (int i = 0; i < len; i++) {
+    data = (data_structure *)malloc(sizeof(data_structure));
 
-		data->header = (head *)malloc(sizeof(head));
+    data->header = (head *)malloc(sizeof(head));
 
-		data->data = (void *)malloc(sizeof(void));
-		memcpy(data->header, arr + bytes, sizeof(head));
-		bytes += sizeof(head);
+    data->data = (void *)malloc(sizeof(void));
+    memcpy(data->header, arr + bytes, sizeof(head));
+    bytes += sizeof(head);
 
-		data->data = realloc(data->data, data->header->len);
+    data->data = realloc(data->data, data->header->len);
 
-		memcpy(data->data, arr + bytes, data->header->len);
-		bytes += data->header->len;
-		free(data->header);
-		free(data->data);
-		free(data);
-	}
-	return bytes;
+    memcpy(data->data, arr + bytes, data->header->len);
+    bytes += data->header->len;
+    free(data->header);
+    free(data->data);
+    free(data);
+  }
+  return bytes;
 }
 
-char *read_word()
-{
-	char *word = malloc(MAX_str);
+char *read_word() {
+  char *word = malloc(MAX_str);
 
-	scanf("%s", word);
+  scanf("%s", word);
 
-	char *new_word = NULL;
-	new_word = realloc(word, strlen(word)+1);
+  char *new_word = NULL;
+  new_word = realloc(word, strlen(word) + 1);
 
-	return new_word;
+  return new_word;
 }
 
-data_structure *create_data()
-{
-	data_structure *data = (data_structure *)malloc(sizeof(data_structure));
+data_structure *create_data() {
+  data_structure *data = (data_structure *)malloc(sizeof(data_structure));
 
-	data->header = (head *)malloc(sizeof(head));
-	data->header->len = 0;
+  data->header = (head *)malloc(sizeof(head));
+  data->header->len = 0;
 
-	scanf("%s", &(data)->header->type);
+  scanf("%s", &(data)->header->type);
 
-	int8_t banknote8;
-	int16_t banknote16;
-	int32_t banknote32;
-	char *aux, *name;
+  int8_t banknote8;
+  int16_t banknote16;
+  int32_t banknote32;
+  char *aux, *name;
 
-	// first name
-	name = read_word();
-	data->header->len += strlen(name) + 1;
+  // first name
+  name = read_word();
+  data->header->len += strlen(name) + 1;
 
-	aux = (char *)malloc(data->header->len);
+  aux = (char *)malloc(data->header->len);
 
-	memcpy(aux, name, strlen(name) + 1);
+  memcpy(aux, name, strlen(name) + 1);
 
-	if (data->header->type == '1')
-	{
-		// first banknote
-		scanf("%hhu", &banknote8);
-		data->header->len += sizeof(banknote8);
-		aux = (char *)realloc(aux, data->header->len);
+  if (data->header->type == '1') {
+    // first banknote
+    scanf("%hhu", &banknote8);
+    data->header->len += sizeof(banknote8);
+    aux = (char *)realloc(aux, data->header->len);
 
-		memcpy(aux + data->header->len - sizeof(banknote8), &banknote8, sizeof(banknote8));
+    memcpy(aux + data->header->len - sizeof(banknote8), &banknote8,
+           sizeof(banknote8));
 
-		// second banknote
-		scanf("%hhu", &banknote8);
-		data->header->len += sizeof(banknote8);
-		aux = (char *)realloc(aux, data->header->len);
+    // second banknote
+    scanf("%hhu", &banknote8);
+    data->header->len += sizeof(banknote8);
+    aux = (char *)realloc(aux, data->header->len);
 
-		memcpy(aux + data->header->len - sizeof(banknote8), &banknote8, sizeof(banknote8));
-	}
+    memcpy(aux + data->header->len - sizeof(banknote8), &banknote8,
+           sizeof(banknote8));
+  }
 
-	if (data->header->type == '2')
-	{
-		// first banknote
-		scanf("%hu", &banknote16);
-		data->header->len += sizeof(banknote16);
-		aux = (char *)realloc(aux, data->header->len);
-		memcpy(aux + data->header->len - sizeof(banknote16), &banknote16, sizeof(banknote16));
+  if (data->header->type == '2') {
+    // first banknote
+    scanf("%hu", &banknote16);
+    data->header->len += sizeof(banknote16);
+    aux = (char *)realloc(aux, data->header->len);
+    memcpy(aux + data->header->len - sizeof(banknote16), &banknote16,
+           sizeof(banknote16));
 
-		// second banknote
-		scanf("%u", &banknote32);
-		data->header->len += sizeof(banknote32);
-		aux = (char *)realloc(aux, data->header->len);
+    // second banknote
+    scanf("%u", &banknote32);
+    data->header->len += sizeof(banknote32);
+    aux = (char *)realloc(aux, data->header->len);
 
-		memcpy(aux + data->header->len - sizeof(banknote32), &banknote32, sizeof(banknote32));
-	}
+    memcpy(aux + data->header->len - sizeof(banknote32), &banknote32,
+           sizeof(banknote32));
+  }
 
-	if (data->header->type == '3')
-	{
-		// first banknote
-		scanf("%u", &banknote32);
-		data->header->len += sizeof(banknote32);
-		aux = (char *)realloc(aux, data->header->len);
+  if (data->header->type == '3') {
+    // first banknote
+    scanf("%u", &banknote32);
+    data->header->len += sizeof(banknote32);
+    aux = (char *)realloc(aux, data->header->len);
 
-		memcpy(aux + data->header->len - sizeof(banknote32), &banknote32, sizeof(banknote32));
+    memcpy(aux + data->header->len - sizeof(banknote32), &banknote32,
+           sizeof(banknote32));
 
-		// second banknote
-		scanf("%u", &banknote32);
-		data->header->len += sizeof(banknote32);
-		aux = (char *)realloc(aux, data->header->len);
+    // second banknote
+    scanf("%u", &banknote32);
+    data->header->len += sizeof(banknote32);
+    aux = (char *)realloc(aux, data->header->len);
 
-		memcpy(aux + data->header->len - sizeof(banknote32), &banknote32, sizeof(banknote32));
-	}
-	free(name);
-	// second name
-	name = read_word();
-	data->header->len += strlen(name) + 1;
-	aux = (char *)realloc(aux, data->header->len);
+    memcpy(aux + data->header->len - sizeof(banknote32), &banknote32,
+           sizeof(banknote32));
+  }
+  free(name);
+  // second name
+  name = read_word();
+  data->header->len += strlen(name) + 1;
+  aux = (char *)realloc(aux, data->header->len);
 
-	memcpy(aux + data->header->len - strlen(name) - 1, name, strlen(name) + 1);
+  memcpy(aux + data->header->len - strlen(name) - 1, name, strlen(name) + 1);
 
-	// copy to data
-	data->data = realloc(aux, data->header->len);
+  // copy to data
+  data->data = realloc(aux, data->header->len);
 
-	free(name);
-	return data;
+  free(name);
+  return data;
 }
 
-int add_last(void **arr, int *len, data_structure *data)
-{
-	if (data == NULL)
-		return 1;
+int add_last(void **arr, int *len, data_structure *data) {
+  if (data == NULL) return 1;
 
-	// calculate lenght of array in bytes
-	int arr_bytes = length_arr(*arr, *len);
+  // calculate lenght of array in bytes
+  int arr_bytes = length_arr(*arr, *len);
 
-	char *aux = (char *)malloc(sizeof(head) + data->header->len);
+  char *aux = (char *)malloc(sizeof(head) + data->header->len);
 
-	int aux_len = 0;
-	// add header (type & len)
-	memcpy(aux, data->header, sizeof(head));
-	aux_len += sizeof(head);
+  int aux_len = 0;
+  // add header (type & len)
+  memcpy(aux, data->header, sizeof(head));
+  aux_len += sizeof(head);
 
-	// add data
-	memcpy(aux + aux_len, data->data, data->header->len);
-	aux_len += data->header->len;
+  // add data
+  memcpy(aux + aux_len, data->data, data->header->len);
+  aux_len += data->header->len;
 
-	// alloc the big array
-	if (*(arr) != NULL)
-	{
-		*(arr) = (void *)realloc(*(arr), aux_len + arr_bytes);
-	}
+  // alloc the big array
+  if (*(arr) != NULL) {
+    *(arr) = (void *)realloc(*(arr), aux_len + arr_bytes);
+  }
 
-	if (*(arr) == NULL)
-	{
-		*(arr) = (void *)malloc(aux_len);
-	}
+  if (*(arr) == NULL) {
+    *(arr) = (void *)malloc(aux_len);
+  }
 
-	// add to the big array
-	memcpy(*(arr) + arr_bytes, aux, aux_len);
+  // add to the big array
+  memcpy(*(arr) + arr_bytes, aux, aux_len);
 
-	free(aux);
-	return 0;
+  free(aux);
+  return 0;
 }
 
-int add_at(void **arr, int *len, data_structure *data, int index)
-{
-	if (index < 0)
-		return 1;
-	
-	if ( index >= *len)
-	{
-			add_last(&(*arr), &(*len), data);
-			return 0;
-	}
-	
-	data_structure *data_aux = (data_structure *)malloc(sizeof(data_structure));
-	int i, len_aux = 0;
+int add_at(void **arr, int *len, data_structure *data, int index) {
+  if (index < 0) return 1;
 
-	data_aux->header = (head *)malloc(sizeof(head));
-	data_aux->data = (void *)malloc(sizeof(void));
-	// find_index
-	for (i = 0; i <= index; i++)
-	{
+  if (index >= *len) {
+    add_last(&(*arr), &(*len), data);
+    return 0;
+  }
 
-		memcpy(data_aux->header, *arr + len_aux, sizeof(head));
+  data_structure *data_aux = (data_structure *)malloc(sizeof(data_structure));
+  int i, len_aux = 0;
 
-		len_aux += sizeof(head);
+  data_aux->header = (head *)malloc(sizeof(head));
+  data_aux->data = (void *)malloc(sizeof(void));
+  // find_index
+  for (i = 0; i <= index; i++) {
+    memcpy(data_aux->header, *arr + len_aux, sizeof(head));
 
-		data_aux->data = realloc(data_aux->data, data_aux->header->len);
+    len_aux += sizeof(head);
 
-		memcpy(data_aux->data, *arr + len_aux, data_aux->header->len);
-		len_aux += data_aux->header->len;
-	}
+    data_aux->data = realloc(data_aux->data, data_aux->header->len);
 
-	// go to first byte for add arr
-	int len_initial = len_aux - data_aux->header->len - sizeof(head);
+    memcpy(data_aux->data, *arr + len_aux, data_aux->header->len);
+    len_aux += data_aux->header->len;
+  }
 
-	void *arr_new = NULL;
-	int len_new = 0;
+  // go to first byte for add arr
+  int len_initial = len_aux - data_aux->header->len - sizeof(head);
 
-	int arr_bytes = length_arr(*arr, *len);
+  void *arr_new = NULL;
+  int len_new = 0;
 
-	// creating a new array for my new data
+  int arr_bytes = length_arr(*arr, *len);
 
-	add_last(&arr_new, &len_new, data);
-	len_new++;
-	int arr_new_bytes = length_arr(arr_new, len_new);
+  // creating a new array for my new data
 
-	// allocating memory for my array
-	*(arr) = (void *)realloc(*(arr), arr_bytes + arr_new_bytes);
+  add_last(&arr_new, &len_new, data);
+  len_new++;
+  int arr_new_bytes = length_arr(arr_new, len_new);
 
-	memmove(*(arr) + len_initial + arr_new_bytes, *(arr) + len_initial, arr_bytes-len_initial);
+  // allocating memory for my array
+  *(arr) = (void *)realloc(*(arr), arr_bytes + arr_new_bytes);
 
+  memmove(*(arr) + len_initial + arr_new_bytes, *(arr) + len_initial,
+          arr_bytes - len_initial);
 
-	memcpy(*(arr) + len_initial, arr_new, arr_new_bytes);
+  memcpy(*(arr) + len_initial, arr_new, arr_new_bytes);
 
-	free(data_aux->data);
-	free(data_aux->header);
-	free(data_aux);
+  free(data_aux->data);
+  free(data_aux->header);
+  free(data_aux);
 
-	free(arr_new);
-	return 0;
+  free(arr_new);
+  return 0;
 }
 
-void find(void *data_block, int len, int index)
-{
-	if (index < 0 || data_block == NULL || len < index)
-		return;
-	data_structure *data = (data_structure *)malloc(sizeof(data_structure));
-	int i, len_aux = 0;
+void find(void *data_block, int len, int index) {
+  if (index < 0 || data_block == NULL || len < index) return;
+  data_structure *data = (data_structure *)malloc(sizeof(data_structure));
+  int i, len_aux = 0;
 
-	data->header = (head *)malloc(sizeof(head));
-	data->data = (void *)malloc(sizeof(void));
-	// find_index
-	for (i = 0; i <= index; i++)
-	{
+  data->header = (head *)malloc(sizeof(head));
+  data->data = (void *)malloc(sizeof(void));
+  // find_index
+  for (i = 0; i <= index; i++) {
+    memcpy(data->header, data_block + len_aux, sizeof(head));
 
-		memcpy(data->header, data_block + len_aux, sizeof(head));
+    len_aux += sizeof(head);
 
-		len_aux += sizeof(head);
+    data->data = realloc(data->data, data->header->len);
 
-		data->data = realloc(data->data, data->header->len);
+    memcpy(data->data, data_block + len_aux, data->header->len);
+    len_aux += data->header->len;
+  }
 
-		memcpy(data->data, data_block + len_aux, data->header->len);
-		len_aux += data->header->len;
-	}
+  void *arr = NULL;
+  len_aux = 0;
+  add_last(&arr, &len_aux, data);
+  len_aux++;
+  print(arr, len_aux);
 
-	void *arr = NULL;
-	len_aux = 0;
-	add_last(&arr, &len_aux, data);
-	len_aux++;
-	print(arr, len_aux);
-
-	free(data->header);
-	free(data->data);
-	free(data);
-	free(arr);
+  free(data->header);
+  free(data->data);
+  free(data);
+  free(arr);
 }
 
-int delete_at(void **arr, int *len, int index)
-{
-	if (index < 0 || *(arr) == NULL || *(len) <= index)
-		return 1;
-	data_structure *data = NULL;
-	int i, len_aux = 0;
+int delete_at(void **arr, int *len, int index) {
+  if (index < 0 || *(arr) == NULL || *(len) <= index) return 1;
+  data_structure *data = NULL;
+  int i, len_aux = 0;
 
-	int arr_bytes = length_arr(*arr, *len);
+  int arr_bytes = length_arr(*arr, *len);
 
-	// find_index
-	for (i = 0; i <= index; i++)
-	{
-		data = (data_structure *)malloc(sizeof(data_structure));
+  // find_index
+  for (i = 0; i <= index; i++) {
+    data = (data_structure *)malloc(sizeof(data_structure));
 
-		data->header = (head *)malloc(sizeof(head));
+    data->header = (head *)malloc(sizeof(head));
 
-		data->data = (void *)malloc(sizeof(void));
-		memcpy(data->header, *(arr) + len_aux, sizeof(head));
+    data->data = (void *)malloc(sizeof(void));
+    memcpy(data->header, *(arr) + len_aux, sizeof(head));
 
-		len_aux += sizeof(head);
+    len_aux += sizeof(head);
 
-		data->data = realloc(data->data, data->header->len);
+    data->data = realloc(data->data, data->header->len);
 
-		memcpy(data->data, *(arr) + len_aux, data->header->len);
-		len_aux += data->header->len;
-		if (i < index)
-		{
-			free(data->data);
-			free(data->header);
-			free(data);
-		}
-	}
+    memcpy(data->data, *(arr) + len_aux, data->header->len);
+    len_aux += data->header->len;
+    if (i < index) {
+      free(data->data);
+      free(data->header);
+      free(data);
+    }
+  }
 
-	// go to first byte from deleted arr
-	int len_initial = len_aux - data->header->len - sizeof(head);
+  // go to first byte from deleted arr
+  int len_initial = len_aux - data->header->len - sizeof(head);
 
-	memcpy(*(arr) + len_initial, *(arr) + len_aux, arr_bytes - len_aux);
+  memcpy(*(arr) + len_initial, *(arr) + len_aux, arr_bytes - len_aux);
 
-	*(arr) = (void *)realloc(*(arr), arr_bytes - (len_aux - len_initial));
+  *(arr) = (void *)realloc(*(arr), arr_bytes - (len_aux - len_initial));
 
-	free(data->data);
-	free(data->header);
-	free(data);
-	return 0;
+  free(data->data);
+  free(data->header);
+  free(data);
+  return 0;
 }
 
-void print(void *arr, int len)
-{
-	data_structure *data = NULL;
-	int len_aux = 0;
+void print(void *arr, int len) {
+  data_structure *data = NULL;
+  int len_aux = 0;
 
-	for (int i = 0; i < len; i++)
-	{
-		data = (data_structure *)malloc(sizeof(data_structure));
+  for (int i = 0; i < len; i++) {
+    data = (data_structure *)malloc(sizeof(data_structure));
 
-		data->header = (head *)malloc(sizeof(head));
+    data->header = (head *)malloc(sizeof(head));
 
-		data->data = (void *)malloc(sizeof(void));
-		memcpy(data->header, arr + len_aux, sizeof(head));
-		len_aux += sizeof(head);
+    data->data = (void *)malloc(sizeof(void));
+    memcpy(data->header, arr + len_aux, sizeof(head));
+    len_aux += sizeof(head);
 
-		data->data = realloc(data->data, data->header->len);
+    data->data = realloc(data->data, data->header->len);
 
-		memcpy(data->data, arr + len_aux, data->header->len);
-		len_aux += data->header->len;
+    memcpy(data->data, arr + len_aux, data->header->len);
+    len_aux += data->header->len;
 
-		printf("Tipul %c\n", data->header->type);
+    printf("Tipul %c\n", data->header->type);
 
-		char *p = (char *)arr + len_aux - data->header->len;
+    char *p = (char *)arr + len_aux - data->header->len;
 
-		while (*p != '\0')
-		{
-			printf("%c", *p);
-			p++;
-		}
-		printf(" pentru ");
+    while (*p != '\0') {
+      printf("%c", *p);
+      p++;
+    }
+    printf(" pentru ");
 
-		void *first_banknote, *second_banknote;
-		if (data->header->type == '1')
-		{
-			first_banknote = (int8_t *)++p;
-			second_banknote = (int8_t *)++p;
+    void *first_banknote, *second_banknote;
+    if (data->header->type == '1') {
+      first_banknote = (int8_t *)++p;
+      second_banknote = (int8_t *)++p;
 
-			p++;
-			while (*p != '\0')
-			{
-				printf("%c", *p);
-				p++;
-			}
-			printf("\n");
-			printf("%" PRId8 "\n", *(int8_t *)first_banknote);
-			printf("%" PRId8 "\n", *(int8_t *)second_banknote);
-		}
+      p++;
+      while (*p != '\0') {
+        printf("%c", *p);
+        p++;
+      }
+      printf("\n");
+      printf("%" PRId8 "\n", *(int8_t *)first_banknote);
+      printf("%" PRId8 "\n", *(int8_t *)second_banknote);
+    }
 
-		if (data->header->type == '2')
-		{
-			first_banknote = (int16_t *)++p;
-			p += 2;
+    if (data->header->type == '2') {
+      first_banknote = (int16_t *)++p;
+      p += 2;
 
-			second_banknote = (int32_t *)p;
-			p += 4;
+      second_banknote = (int32_t *)p;
+      p += 4;
 
-			while (*p != '\0')
-			{
-				printf("%c", *p);
-				p++;
-			}
-			printf("\n");
-			printf("%" PRId16 "\n", *(int16_t *)first_banknote);
-			printf("%" PRId32 "\n", *(int32_t *)second_banknote);
-		}
+      while (*p != '\0') {
+        printf("%c", *p);
+        p++;
+      }
+      printf("\n");
+      printf("%" PRId16 "\n", *(int16_t *)first_banknote);
+      printf("%" PRId32 "\n", *(int32_t *)second_banknote);
+    }
 
-		if (data->header->type == '3')
-		{
-			first_banknote = (int32_t *)++p;
-			p += 4;
+    if (data->header->type == '3') {
+      first_banknote = (int32_t *)++p;
+      p += 4;
 
-			second_banknote = (int32_t *)p;
-			p += 4;
+      second_banknote = (int32_t *)p;
+      p += 4;
 
-			while (*p != '\0')
-			{
-				printf("%c", *p);
-				p++;
-			}
-			printf("\n");
-			printf("%" PRId32 "\n", *(int32_t *)first_banknote);
-			printf("%" PRId32 "\n", *(int32_t *)second_banknote);
-		}
-		printf("\n");
-		free(data->data);
-		free(data->header);
-		free(data);
-	}
+      while (*p != '\0') {
+        printf("%c", *p);
+        p++;
+      }
+      printf("\n");
+      printf("%" PRId32 "\n", *(int32_t *)first_banknote);
+      printf("%" PRId32 "\n", *(int32_t *)second_banknote);
+    }
+    printf("\n");
+    free(data->data);
+    free(data->header);
+    free(data);
+  }
 }
 
-int main()
-{
-	// the vector of bytes u have to work with
-	// good luck :)
-	void *arr = NULL;
-	int len = 0;
+int main() {
+  // the vector of bytes u have to work with
+  // good luck :)
+  void *arr = NULL;
+  int len = 0;
 
-	data_structure *data = NULL;
+  data_structure *data = NULL;
 
-	char *cmd = read_word();
-	int index;
+  char *cmd = read_word();
+  int index;
 
-	while (strcmp(cmd, "exit"))
-	{
-		if (strcmp(cmd, "insert") == 0)
-		{
-			data = create_data();
-			add_last(&arr, &len, data);
-			len++;
-			free(data->header);
-			free(data->data);
-			free(data);
-		}
+  while (strcmp(cmd, "exit")) {
+    if (strcmp(cmd, "insert") == 0) {
+      data = create_data();
+      add_last(&arr, &len, data);
+      len++;
+      free(data->header);
+      free(data->data);
+      free(data);
+    }
 
-		if (strcmp(cmd, "insert_at") == 0)
-		{
-			scanf("%d", &index);
-			data = create_data();
-			if ( !add_at(&arr, &len, data, index))
-				len++;
-			free(data->header);
-			free(data->data);
-			free(data);
-		}
+    if (strcmp(cmd, "insert_at") == 0) {
+      scanf("%d", &index);
+      data = create_data();
+      if (!add_at(&arr, &len, data, index)) len++;
+      free(data->header);
+      free(data->data);
+      free(data);
+    }
 
-		if (strcmp(cmd, "find") == 0)
-		{
-			scanf("%d", &index);
-			find(arr, len, index);
-		}
+    if (strcmp(cmd, "find") == 0) {
+      scanf("%d", &index);
+      find(arr, len, index);
+    }
 
-		if (strcmp(cmd, "delete_at") == 0)
-		{
-			scanf("%d", &index);
-			if (!delete_at(&arr, &len, index))
-				len--;
-		}
+    if (strcmp(cmd, "delete_at") == 0) {
+      scanf("%d", &index);
+      if (!delete_at(&arr, &len, index)) len--;
+    }
 
-		if (strcmp(cmd, "print") == 0)
-		{
-			print(arr, len);
-		}
-		free(cmd);
-		cmd = read_word();
-	}
+    if (strcmp(cmd, "print") == 0) {
+      print(arr, len);
+    }
+    free(cmd);
+    cmd = read_word();
+  }
 
-	if (arr != NULL)
-		free(arr);
+  if (arr != NULL) free(arr);
 
-	free(cmd);
+  free(cmd);
 
-	return 0;
+  return 0;
 }
